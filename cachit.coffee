@@ -22,6 +22,8 @@ strategies =
       load.then -> store[k]
 
 cachit = (strategy = strategies.memory()) ->
+  if typeof strategy is 'string'
+    strategy = strategies.file(strategy, true)
   { store, fetch, hasKey } = strategy
   hasKey ?= (k) -> fetch(k).then (v) -> v?
   (k, v) ->

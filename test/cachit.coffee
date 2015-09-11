@@ -1,4 +1,6 @@
 assert = require 'assert'
+fs = require 'fs'
+path = require 'path'
 cachit = require '../cachit'
 
 describe "cachit", ->
@@ -25,8 +27,27 @@ describe "cachit", ->
         .then(-> done()).catch(done)
   describe "file store", ->
     file = path.join(__dirname, "cache.json")
+    cache = cachit(file)
+    x = null
     before (done) ->
-      fs.writeFile file, 'utf8', JSON.stringify(foo: 'Foo.'), (err) ->
+      x = 0
+      fs.writeFile file, JSON.stringify(foo: 'Foo.'), 'utf8', (err) ->
         throw err if err?
         cache = cachit(file)
         done()
+    it "uses the JSON file", (done) ->
+      cache('foo', -> (x += 1; "FOO!"))
+        .then (result) ->
+          assert.equal 'Foo.', result
+          assert.equal 0, x
+        .then(-> done()).catch(done)
+    it "works normally otherwise", (done) ->
+      cache('bar', -> (x += 1; "BAR!"))
+        .then (result) ->
+          assert.equal 'BAR!', result
+          assert.equal 1, x
+        .then -> cache('bar', -> (x += 1; "BLAH!"))
+        .then (result) ->
+          assert.equal 'BAR!', result
+          assert.equal 1, x
+        .then(-> done()).catch(done)
