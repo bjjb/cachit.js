@@ -23,3 +23,10 @@ describe "cachit", ->
           assert.equal 'BAR!', result
           assert.equal 2, x
         .then(-> done()).catch(done)
+  describe "file store", ->
+    file = path.join(__dirname, "cache.json")
+    before (done) ->
+      fs.writeFile file, 'utf8', JSON.stringify(foo: 'Foo.'), (err) ->
+        throw err if err?
+        cache = cachit(file)
+        done()
