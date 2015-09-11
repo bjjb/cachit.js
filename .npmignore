@@ -1,2 +1,4 @@
 **/*.coffee
 Cakefile
+npm-debug.log
+.projections.json
